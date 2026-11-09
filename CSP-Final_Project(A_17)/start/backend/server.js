@@ -930,10 +930,10 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = {
-  app,
-  startServer,
-  generateToken,
-  verifyToken,
-  getAuthenticatedUser,
-};
+module.exports = app;
+
+module.exports.startServer = startServer;
+module.exports.generateToken = generateToken;
+module.exports.verifyToken = verifyToken;
+module.exports.getAuthenticatedUser = getAuthenticatedUser;
+
