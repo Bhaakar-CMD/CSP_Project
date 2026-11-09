@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login - Smart Irrigation</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div align="left" style="margin: 15px 20px;">
+    <a href="firstpage.html" style="font-size: 1.1rem; color: #ffeb3b; text-decoration: none;">🏠 Return to Home</a>
+  </div>
+  <h1 align="center">🔒 Admin Login</h1>
+  <form id="adminLoginForm" align="center">
+    <label for="username"><b>Username:</b></label><br>
+    <input type="text" id="username" name="username" required><br><br>
+    <label for="password"><b>Password:</b></label><br>
+    <input type="password" id="password" name="password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+  <div id="loginMessage" align="center" style="color:red; margin-top:10px;"></div>
+
+  <script>
+    function logoutAdmin() {
+      localStorage.removeItem('adminToken');
+      window.location.reload();
+    }
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const msgDiv = document.getElementById('loginMessage');
+      try {
+        const url = (window.location.port === "5000") ? "/admin/login" : "http://localhost:5000/admin/login";
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const result = await res.json();
+        if (res.ok && result.token) {
+          localStorage.setItem('adminToken', result.token);
+          window.location.href = 'admin_feedback.html';
+        } else {
+          msgDiv.textContent = result.message || 'Login failed.';
+        }
+      } catch (e) {
+        msgDiv.textContent = 'Server error. Try again later.';
+      }
+    });
+  </script>
+</body>
+</html>

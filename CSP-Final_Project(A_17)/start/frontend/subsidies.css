@@ -1,0 +1,148 @@
+/* subsidies.css */
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom right, #f0fff0, #e4f5e9);
+  color: #2e3d27;
+  padding: 30px 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+.back-top-left {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff; /* White text */
+  text-decoration: none;
+  background-color: #4CAF50; /* Rich green background */
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 100;
+}
+
+.back-top-left:hover {
+  background-color: #388e3c; /* Darker green on hover */
+  transform: scale(1.05);
+}
+
+
+
+/* Heading */
+h1 {
+  text-align: center;
+  color: #2d912d;
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+p.align-center,
+p[align="center"] {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #3a513a;
+}
+
+/* Card Container */
+.section {
+  background-color: #ffffff;
+  border-left: 6px solid #4CAF50;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 128, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.15);
+}
+
+/* Sub-Heading */
+h2 {
+  color: #2e7d32;
+  margin-bottom: 10px;
+  font-size: 1.6rem;
+  border-bottom: 2px dashed #c8e6c9;
+  padding-bottom: 5px;
+}
+
+/* Paragraph */
+p {
+  font-size: 1.1rem;
+  margin: 10px 0 15px 0;
+}
+
+/* Lists */
+ul {
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-left: 25px;
+  font-size: 1.05rem;
+}
+
+ul li {
+  margin-bottom: 8px;
+}
+
+/* Links */
+a {
+  color: #1b5e20;
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 1px dashed #1b5e20;
+}
+
+a:hover {
+  color: #145a14;
+  border-bottom: 1px solid #145a14;
+}
+
+/* Back Link */
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #388e3c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.back-link:hover {
+  color: #2e7d32;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  body {
+    padding: 20px 15px;
+  }
+
+  p,
+  ul {
+    font-size: 1rem;
+  }
+}

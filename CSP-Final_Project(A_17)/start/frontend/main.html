@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome - Irrigation Dashboard</title>
+  <link rel="stylesheet" href="main.css">
+  <script>
+    // Immediate client-side authentication guard
+    (async function verifyAuthGuard() {
+      const token = localStorage.getItem("authToken");
+      try {
+        const response = await fetch("/api/auth/me", {
+          headers: {
+            "Authorization": `Bearer ${token || ""}`
+          },
+          credentials: "include"
+        });
+        if (!response.ok) {
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("authUser");
+          window.location.replace("login.html?unauthorized=1");
+          return;
+        }
+        const data = await response.json();
+        if (data && data.user && data.user.username) {
+          window.currentAuthUser = data.user;
+          document.addEventListener("DOMContentLoaded", () => {
+            const uVal = document.getElementById("usernameVal");
+            if (uVal) uVal.textContent = data.user.username;
+          });
+        }
+      } catch (e) {
+        if (!token) {
+          window.location.replace("login.html?unauthorized=1");
+        }
+      }
+    })();
+  </script>
+  <style>
+    /* Scoped In-Player YouTube Controls & Settings Styles */
+    .video-player-wrapper {
+      position: relative;
+      width: 100%;
+      margin: 14px 0;
+    }
+
+    .yt-player-controls-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 40;
+      pointer-events: auto;
+    }
+
+    .yt-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .yt-live-indicator {
+      font-size: 0.72em;
+      font-weight: 800;
+      background: #cc181e;
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .yt-video-title-label {
+      color: #ffffff;
+      font-size: 0.88em;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+    }
+
+    .yt-gear-btn {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.25s ease, background 0.2s;
+    }
+
+    .yt-gear-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(45deg);
+    }
+
+    .yt-gear-svg {
+      display: block;
+    }
+
+    .yt-dark-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 50;
+      backdrop-filter: blur(2px);
+      cursor: pointer;
+    }
+
+    .yt-white-panel {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 290px;
+      max-width: 88%;
+      background: #ffffff;
+      color: #0f0f0f;
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      z-index: 60;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow: hidden;
+      animation: ytSlideUp 0.18s cubic-bezier(0, 0, 0.2, 1);
+      text-align: left;
+    }
+
+    @keyframes ytSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .yt-menu-page {
+      padding: 6px 0;
+    }
+
+    .yt-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    .yt-menu-item:hover {
+      background: #f2f2f2;
+    }
+
+    .yt-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .yt-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      color: #0f0f0f;
+    }
+
+    .yt-item-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #0f0f0f;
+    }
+
+    .yt-item-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .yt-item-value {
+      font-size: 13px;
+      color: #606060;
+      font-weight: 400;
+    }
+
+    .yt-active-lang {
+      color: #065fd4;
+      font-weight: 600;
+    }
+
+    .yt-chevron {
+      font-size: 16px;
+      color: #909090;
+      line-height: 1;
+    }
+
+    .yt-submenu-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e5e5;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f0f0f;
+      transition: background 0.15s ease;
+    }
+
+    .yt-submenu-header:hover {
+      background: #f2f2f2;
+    }
+
+    .yt-back-arrow {
+      font-size: 18px;
+      line-height: 1;
+      color: #0f0f0f;
+    }
+
+    .yt-submenu-list {
+      padding: 4px 0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .yt-sub-option {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      cursor: pointer;
+      user-select: none;
+      gap: 12px;
+      transition: background 0.15s ease;
+    }
+
+    .yt-sub-option:hover {
+      background: #f2f2f2;
+    }
+
+    .yt-sub-option.active {
+      background: #e8f0fe;
+    }
+
+    .yt-option-check {
+      width: 18px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #065fd4;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .yt-option-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .yt-opt-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #0f0f0f;
+    }
+
+    .yt-opt-sub {
+      font-size: 11px;
+      color: #606060;
+    }
+
+    .yt-farmer-info-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+      padding: 8px 14px;
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: left;
+    }
+
+    .yt-current-track-badge {
+      font-size: 0.88em;
+      font-weight: 600;
+      color: #a8ffb5;
+    }
+
+    @media (max-width: 600px) {
+      .yt-white-panel {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top User Navigation Bar with Logout -->
+  <header class="top-user-bar">
+    <div class="brand-info">
+      🌱 <span>Smart Irrigation Dashboard</span>
+    </div>
+    <div class="nav-menu">
+      <a href="techniques.html">💧 Techniques</a>
+      <a href="subsidies.html">🌾 Subsidies</a>
+      <a href="feedback.html">📝 Feedback</a>
+      <span class="user-badge" id="userBadgeDisplay">👤 <span id="usernameVal">Farmer</span></span>
+      <button type="button" class="logout-action-btn" id="logoutBtn" onclick="handleLogout()" title="Log out and return to Login">🚪 Logout</button>
+    </div>
+  </header>
+
+  <h1 align="center">🌱 Welcome to Smart Irrigation Dashboard</h1>
+  <h3 align="center">✅ You are successfully logged in!</h3>
+
+  <h2 align="center">🌍 Enter Your Farming Details</h2>
+
+  <!-- Updated form -->
+  <form id="irrigationForm" align="center">
+   <b>Select Crop:</b>
+<select id="crop" name="crop" required>
+  <option value="">-- Choose Crop --</option>
+
+    <option value="Paddy">🌾 Paddy</option>
+    <option value="Maize">🌽 Maize</option>
+    <option value="Bajra">🌾 Bajra (Pearl Millet)</option>
+    <option value="Red Gram">🍛 Red Gram (Tur / Arhar)</option>
+    <option value="Green Gram">🥣 Green Gram (Moong)</option>
+    <option value="Cotton">🧵 Cotton</option>
+    <option value="Chilli">🌶️ Chilli</option>
+</select><br><br>
+
+<b>Enter Area (in acres):</b>
+<input type="number" id="area" name="area" placeholder="e.g. 1" min="1" max="5" step="1" required>
+<br><br>
+
+
+ <b>Select Soil Type:</b>
+<select id="soil" name="soil" required>
+  <option value="">-- Choose Soil Type --</option>
+  <option value="Alluvial">🏞️ Alluvial Soil  </option>
+  <option value="Black Soil">⚫ Black Soil </option>
+  <option value="Red Soil">🟥 Red Soil </option>
+  <option value="Coastal Sandy Soil">🏖️ Coastal Sandy Soil </option>
+</select><br><br>
+
+
+    <b>Available Water Level:</b>
+    <select id="water" name="water" required>
+      <option value="Very Low">💧 Very Low</option>
+      <option value="Low">🚰 Low</option>
+      <option value="Medium">💦 Medium</option>
+      <option value="High">🌊 High</option>
+    </select><br><br>
+
+    <button type="submit">💡 Suggest Irrigation Method</button>
+  </form>
+
+  <!-- Div to show suggestion results -->
+  <div id="result" align="center" style="margin-top:20px;"></div>
+
+  <!-- JavaScript -->
+  <script>
+    // Clean string removing surrounding quotes, slashes, or whitespace
+    function cleanMediaUrl(raw) {
+      if (!raw) return "";
+      return String(raw).replace(/^["'\s\\]+|["'\s\\]+$/g, "").trim();
+    }
+
+    // Parse any video URL (YouTube, Vimeo, AWS S3, direct MP4, or local path)
+    function parseVideoSource(rawUrl, fallbackLocal) {
+      const url = cleanMediaUrl(rawUrl);
+      const fallback = fallbackLocal || "videos/sprinkler.mp4";
+
+      if (!url) {
+        return { type: "direct", src: fallback, fallbackSrc: fallback, isLocal: true };
+      }
+
+      // Check YouTube URLs
+      const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/i);
+      if (ytMatch) {
+        return {
+          type: "youtube",
+          videoId: ytMatch[1],
+          embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`,
+          externalUrl: `https://www.youtube.com/watch?v=${ytMatch[1]}`,
+          fallbackSrc: fallback
+        };
+      }
+
+      // Check Vimeo URLs
+      const vimeoMatch = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/(?:\d+\/)?video\/|)(\d+)/i);
+      if (vimeoMatch) {
+        return {
+          type: "vimeo",
+          embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
+          externalUrl: url,
+          fallbackSrc: fallback
+        };
+      }
+
+      // Direct video file (AWS S3 URL, MP4/WebM/OGG, or local video path)
+      return {
+        type: "direct",
+        src: url,
+        fallbackSrc: fallback,
+        externalUrl: url.startsWith("http") ? url : ""
+      };
+    }
+
+    // ==========================================
+    // LOGOUT HANDLER
+    // ==========================================
+    async function handleLogout() {
+      try {
+        await fetch("/logout", {
+          method: "POST",
+          credentials: "include"
+        });
+      } catch (err) {
+        console.warn("Logout error:", err);
+      }
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("authUser");
+      window.location.href = "firstpage.html?logged_out=1";
+    }
+
+    document.getElementById("irrigationForm").addEventListener("submit", async function(event) {
+      event.preventDefault(); // Prevent page reload
+
+      // Gather form values
+      const data = {
+        crop: document.getElementById("crop").value,
+        soil: document.getElementById("soil").value,
+        water: document.getElementById("water").value,
+        area: document.getElementById("area").value
+      };
+
+      const resultDiv = document.getElementById("result");
+      
+      // Stop and completely dispose of any previous video/audio before loading new recommendation
+      const oldIframe = document.getElementById("embeddedVideoFrame");
+      if (oldIframe) {
+        oldIframe.src = "about:blank";
+      }
+      resultDiv.innerHTML = "<p style='color:#a8ffb5; font-size:1.15em;'>⏳ Loading best irrigation recommendation...</p>";
+
+      try {
+        const authToken = localStorage.getItem("authToken") || "";
+        const primaryUrl = (window.location.port === "5000") ? "/suggest" : "http://localhost:5000/suggest";
+        
+        let response = await fetch(primaryUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${authToken}`
+          },
+          credentials: "include",
+          body: JSON.stringify(data)
+        });
+
+        if (response.status === 401) {
+          resultDiv.innerHTML = `<div style="background: rgba(220, 53, 69, 0.25); border: 1px solid #ff6b6b; border-radius: 10px; padding: 15px; margin: 15px auto; max-width: 500px;"><p style="color: #ff8080; font-weight: bold; font-size: 1.15em;">🔒 Session Expired or Unauthorized.</p><p style="color: #fff;">Redirecting to Login page...</p></div>`;
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("authUser");
+          setTimeout(() => {
+            window.location.href = "login.html?unauthorized=1";
+          }, 1500);
+          return;
+        }
+
+        let result = {};
+        try {
+          result = await response.json();
+        } catch (jsonErr) {
+          result = {};
+        }
+
+        if (response.ok && result.method) {
+          renderRecommendation(result, data);
+        } else {
+          resultDiv.innerHTML = `<p style="color: #ffcc00; font-weight: bold; font-size: 1.15em;">❌ ${result.message || "No irrigation method found for your input."}</p>`;
+        }
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        resultDiv.innerHTML = `<p style="color: #ff6b6b; font-weight: bold;">⚠️ Could not connect to the backend server. Please make sure the server is running on port 5000 and try again.</p>`;
+      }
+    });
+
+    // ==========================================
+    // METHOD MEDIA CONFIGURATION (Genuine Telugu Audio Videos)
+    // ==========================================
+
+    function toEmbedUrl(raw) {
+      if (!raw) return "";
+      const m = String(raw).match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/i);
+      return m ? `https://www.youtube.com/embed/${m[1]}` : raw.split("?")[0];
+    }
+
+    const METHOD_MEDIA = {
+      furrow: {
+        name: "Furrow Irrigation",
+        image: "images/Furrow.jpg",
+        video: "https://youtu.be/LfcFprFY9Ig?si=0voBFs2yUBRKBIyi",
+      },
+      subsurface: {
+        name: "Subsurface Irrigation",
+        image: "images/subsurface.jpg",
+        video: "https://www.youtube.com/embed/sH3jQ4ziQ_k",
+      },
+      sprinkler: {
+        name: "Sprinkler Irrigation",
+        image: "images/spri.jpg",
+        video: "https://youtu.be/F3HpRuUW2A8?si=D6U-FiYumNaiHOKH",
+      },
+      center: {
+        name: "Center Pivot Irrigation",
+        image: "images/center.jpg",
+        video: "https://www.youtube.com/embed/HvvNvFXZu8k",
+      },
+      surface: {
+        name: "Surface Irrigation",
+        image: "images/surface.jpg",
+        video: "https://youtube.com/shorts/9JamSTrI5es?si=mKQrgkjhoD3QZ9za",
+      },
+      drip: {
+        name: "Drip Irrigation",
+        image: "images/drip.jpg",
+        video: "https://youtu.be/d5GPzKER5yw",
+      }
+    };
+
+    function getFallbackMedia(methodName) {
+      const m = String(methodName || "").toLowerCase();
+      if (m.includes("furrow")) return METHOD_MEDIA.furrow;
+      if (m.includes("subsurface")) return METHOD_MEDIA.subsurface;
+      if (m.includes("sprinkler")) return METHOD_MEDIA.sprinkler;
+      if (m.includes("center") || m.includes("pivot")) return METHOD_MEDIA.center;
+      if (m.includes("surface") || m.includes("paddy") || m.includes("awd") || m.includes("flood")) return METHOD_MEDIA.surface;
+      return METHOD_MEDIA.drip;
+    }
+
+    // ==========================================
+    // YOUTUBE-STYLE VIDEO PLAYER SETTINGS LOGIC
+    // ==========================================
+
+    window.currentIrrigationResult = null;
+    window.currentAudioTrack = "telugu"; // Telugu by default
+    window.currentPlaybackSpeed = 1.0;
+    window.currentQuality = "Auto (720p)";
+    window.currentCaptions = "Off";
+    window.videoStartTime = 0;
+    window.videoCurrentOffset = 0;
+    window.currentFixedVideoUrl = "";
+
+    function toggleYtSettings(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const panel = document.getElementById("ytWhitePanel");
+      const overlay = document.getElementById("ytDarkOverlay");
+      if (!panel || !overlay) return;
+
+      const isHidden = (panel.style.display === "none" || !panel.style.display);
+      if (isHidden) {
+        showYtPage("ytPageMain");
+        panel.style.display = "block";
+        overlay.style.display = "block";
+      } else {
+        closeYtSettings();
+      }
+    }
+
+    function closeYtSettings() {
+      const panel = document.getElementById("ytWhitePanel");
+      const overlay = document.getElementById("ytDarkOverlay");
+      if (panel) panel.style.display = "none";
+      if (overlay) overlay.style.display = "none";
+    }
+
+    function showYtPage(pageId) {
+      const pages = ["ytPageMain", "ytPageAudio", "ytPageSpeed", "ytPageQuality", "ytPageCaptions"];
+      pages.forEach(p => {
+        const el = document.getElementById(p);
+        if (el) el.style.display = (p === pageId) ? "block" : "none";
+      });
+    }
+
+    function openYtSubmenu(submenuName) {
+      if (submenuName === "audio") showYtPage("ytPageAudio");
+      else if (submenuName === "speed") showYtPage("ytPageSpeed");
+      else if (submenuName === "quality") showYtPage("ytPageQuality");
+      else if (submenuName === "captions") showYtPage("ytPageCaptions");
+    }
+
+    function backToYtMain() {
+      showYtPage("ytPageMain");
+    }
+
+    // Audio Track Selection & Real Synchronized Audio Switching (Same Video Source)
+    function selectAudioLanguage(lang) {
+      if (lang !== "telugu" && lang !== "english") return;
+      const result = window.currentIrrigationResult;
+      if (!result) return;
+
+      if (window.currentAudioTrack === lang) {
+        closeYtSettings();
+        return;
+      }
+
+      // 1. Maintain synchronization timestamp across language switch
+      const now = Date.now();
+      let currentSecond = 0;
+      if (window.videoStartTime) {
+        const elapsedSec = (now - window.videoStartTime) / 1000;
+        currentSecond = Math.max(0, Math.floor(window.videoCurrentOffset + (elapsedSec * window.currentPlaybackSpeed)));
+      }
+      window.videoStartTime = now;
+      window.videoCurrentOffset = currentSecond;
+      window.currentAudioTrack = lang;
+
+      // 2. Update text on main settings panel
+      const valAudio = document.getElementById("valAudio");
+      if (valAudio) {
+        valAudio.textContent = (lang === "telugu") ? "Telugu" : "English";
+      }
+
+      // 3. Update checkmarks & active styling in Audio Track Submenu
+      ["telugu", "english"].forEach(l => {
+        const check = document.getElementById(`check_${l}`);
+        const opt = document.getElementById(`audioOpt_${l}`);
+        if (check) check.textContent = (l === lang) ? "✓" : "";
+        if (opt) {
+          if (l === lang) opt.classList.add("active");
+          else opt.classList.remove("active");
+        }
+      });
+
+      // 4. Update language on the SAME video player
+      const iframe = document.getElementById("embeddedVideoFrame");
+      const fixedBaseUrl = toEmbedUrl(window.currentFixedVideoUrl || result.video_url || result.video_telugu || getFallbackMedia(result.method).video);
+      const langCode = (lang === "telugu") ? "te" : "en";
+
+      if (iframe) {
+        // Send postMessage API commands to set language and captions track
+        try {
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: "command",
+            func: "setOption",
+            args: ["captions", "track", { languageCode: langCode }]
+          }), "*");
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: "command",
+            func: "setAudioTrack",
+            args: [langCode]
+          }), "*");
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: "command",
+            func: "setLanguage",
+            args: [langCode]
+          }), "*");
+        } catch (e) {
+          console.warn("postMessage error:", e);
+        }
+
+        // Maintain the EXACT SAME video URL, paused until user plays (autoplay=0)
+        const embedWithParams = `${fixedBaseUrl}?autoplay=0&enablejsapi=1&start=${currentSecond}&rel=0&hl=${langCode}&cc_lang_pref=${langCode}`;
+        iframe.src = embedWithParams;
+
+        setTimeout(() => {
+          if (iframe && iframe.contentWindow && window.currentPlaybackSpeed !== 1.0) {
+            iframe.contentWindow.postMessage(JSON.stringify({
+              event: "command",
+              func: "setPlaybackRate",
+              args: [window.currentPlaybackSpeed]
+            }), "*");
+          }
+        }, 500);
+      }
+
+      closeYtSettings();
+    }
+
+    // Playback Speed Selection with PostMessage Command
+    function selectPlaybackSpeed(speedVal, speedLabel) {
+      const now = Date.now();
+      if (window.videoStartTime) {
+        const elapsedSec = (now - window.videoStartTime) / 1000;
+        window.videoCurrentOffset = Math.max(0, Math.floor(window.videoCurrentOffset + (elapsedSec * window.currentPlaybackSpeed)));
+        window.videoStartTime = now;
+      }
+
+      window.currentPlaybackSpeed = speedVal;
+
+      const valSpeed = document.getElementById("valSpeed");
+      if (valSpeed) valSpeed.textContent = speedLabel;
+
+      const speeds = [
+        { id: "speed_0_5", val: 0.5 },
+        { id: "speed_0_75", val: 0.75 },
+        { id: "speed_1_0", val: 1.0 },
+        { id: "speed_1_25", val: 1.25 },
+        { id: "speed_1_5", val: 1.5 },
+        { id: "speed_2_0", val: 2.0 }
+      ];
+      speeds.forEach(s => {
+        const check = document.getElementById(s.id);
+        if (check) check.textContent = (s.val === speedVal) ? "✓" : "";
+      });
+
+      // Control playback speed on embedded YouTube iframe
+      const iframe = document.getElementById("embeddedVideoFrame");
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(JSON.stringify({
+          event: "command",
+          func: "setPlaybackRate",
+          args: [speedVal]
+        }), "*");
+      }
+
+      backToYtMain();
+    }
+
+    // Quality Selection
+    function selectVideoQuality(qualityLabel) {
+      window.currentQuality = qualityLabel;
+
+      const valQuality = document.getElementById("valQuality");
+      if (valQuality) valQuality.textContent = qualityLabel;
+
+      ["q_1080", "q_720", "q_480", "q_360"].forEach(qId => {
+        const check = document.getElementById(qId);
+        if (check) {
+          const isMatch = (qId === "q_1080" && qualityLabel.includes("1080")) ||
+                          (qId === "q_720" && qualityLabel.includes("720")) ||
+                          (qId === "q_480" && qualityLabel.includes("480")) ||
+                          (qId === "q_360" && qualityLabel.includes("360"));
+          check.textContent = isMatch ? "✓" : "";
+        }
+      });
+
+      backToYtMain();
+    }
+
+    // Captions Selection
+    function selectCaptions(captionLabel) {
+      window.currentCaptions = captionLabel;
+
+      const valCaptions = document.getElementById("valCaptions");
+      if (valCaptions) valCaptions.textContent = captionLabel;
+
+      ["cap_off", "cap_te", "cap_en"].forEach(cId => {
+        const check = document.getElementById(cId);
+        if (check) {
+          const isMatch = (cId === "cap_off" && captionLabel === "Off") ||
+                          (cId === "cap_te" && captionLabel === "Telugu") ||
+                          (cId === "cap_en" && captionLabel === "English");
+          check.textContent = isMatch ? "✓" : "";
+        }
+      });
+
+      backToYtMain();
+    }
+
+    // Close settings popup when clicking outside video player container
+    document.addEventListener("click", function(e) {
+      const panel = document.getElementById("ytWhitePanel");
+      const gear = document.getElementById("ytGearBtn");
+      if (panel && panel.style.display === "block") {
+        if (!panel.contains(e.target) && (!gear || !gear.contains(e.target))) {
+          closeYtSettings();
+        }
+      }
+    });
+
+    // Render Recommendation: Displays ONLY Image and Relevant Video with YouTube-style Settings
+    function renderRecommendation(result, data) {
+      window.currentIrrigationResult = result;
+      window.currentAudioTrack = "telugu"; // Telugu by default
+      window.currentPlaybackSpeed = 1.0;
+      window.currentQuality = "Auto (720p)";
+      window.currentCaptions = "Off";
+      window.videoStartTime = Date.now();
+      window.videoCurrentOffset = 0;
+
+      const resultDiv = document.getElementById("result");
+
+      // Match media configuration
+      const media = getFallbackMedia(result.method);
+      const rawImage = cleanMediaUrl(result.image_url || result.image);
+      const displayImage = rawImage || media.image;
+      const fallbackImg = media.image;
+      const methodName = result.method || media.name;
+
+      // The ONE fixed video URL for this method (Converted to standard YouTube Embed URL)
+      const baseVideoUrl = toEmbedUrl(result.video_url || result.video_telugu || media.video);
+      window.currentFixedVideoUrl = baseVideoUrl;
+
+      // Genuine Telugu video paused initially (plays when user clicks play)
+      const initialEmbed = `${baseVideoUrl}?autoplay=0&enablejsapi=1&start=0&rel=0&hl=te&cc_lang_pref=te`;
+
+      resultDiv.innerHTML = `
+        <div class="recommendation-card">
+          <h3>💡 Recommended: ${methodName}</h3>
+
+          <!-- 1. The selected irrigation method image -->
+          <div style="text-align: center; margin: 15px 0 20px 0;">
+            <img id="recImg" src="${displayImage}" alt="${methodName}" 
+                 onerror="if(this.src !== '${fallbackImg}') { this.onerror=null; this.src='${fallbackImg}'; }" 
+                 style="max-width: 100%; max-height: 380px; object-fit: cover; border-radius: 12px; border: 2px solid #4caf50; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: block; margin: 0 auto;">
+          </div>
+
+          <!-- 2. The relevant irrigation method video -->
+          <div class="video-player-wrapper" id="videoPlayerWrapper">
+            <div class="video-container" id="playerContainer">
+              
+              <!-- Embedded Video Frame (Telugu Native Video, Paused on Load) -->
+              <iframe 
+                id="embeddedVideoFrame"
+                src="${initialEmbed}" 
+                title="${methodName} Practical Video Tutorial" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+              </iframe>
+
+              <!-- In-Player Controls Overlay Bar -->
+              <div class="yt-player-controls-bar">
+                <div class="yt-controls-left">
+                  <span class="yt-live-indicator">TUTORIAL</span>
+                  <span class="yt-video-title-label">${methodName}</span>
+                </div>
+                <div class="yt-controls-right">
+                  <button type="button" 
+                          class="yt-gear-btn" 
+                          id="ytGearBtn" 
+                          onclick="toggleYtSettings(event)" 
+                          title="Settings" 
+                          aria-label="Settings">
+                    <svg class="yt-gear-svg" viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
+                      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dark Semi-transparent Overlay Behind Popup -->
+              <div class="yt-dark-overlay" id="ytDarkOverlay" onclick="closeYtSettings()" style="display: none;"></div>
+
+              <!-- YouTube-style Modern White Settings Panel -->
+              <div class="yt-white-panel" id="ytWhitePanel" style="display: none;">
+                
+                <!-- Page 1: Main Settings Menu -->
+                <div class="yt-menu-page" id="ytPageMain">
+                  <!-- Quality -->
+                  <div class="yt-menu-item" onclick="openYtSubmenu('quality')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f">
+                          <path d="M15 17h6v2h-6zm-8-2h6v2H7zm-4-4h18v2H3zm4-4h6v2H7zm8-2h6v2h-6z"/>
+                        </svg>
+                      </span>
+                      <span class="yt-item-title">Quality</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-value" id="valQuality">Auto (720p)</span>
+                      <span class="yt-chevron">›</span>
+                    </div>
+                  </div>
+
+                  <!-- Playback Speed -->
+                  <div class="yt-menu-item" onclick="openYtSubmenu('speed')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5v-5l4.5 2.5-4.5 2.5z"/>
+                        </svg>
+                      </span>
+                      <span class="yt-item-title">Playback speed</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-value" id="valSpeed">Normal</span>
+                      <span class="yt-chevron">›</span>
+                    </div>
+                  </div>
+
+                  <!-- Captions -->
+                  <div class="yt-menu-item" onclick="openYtSubmenu('captions')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f">
+                          <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z"/>
+                        </svg>
+                      </span>
+                      <span class="yt-item-title">Captions</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-value" id="valCaptions">Off</span>
+                      <span class="yt-chevron">›</span>
+                    </div>
+                  </div>
+
+                  <!-- Audio Track -->
+                  <div class="yt-menu-item" onclick="openYtSubmenu('audio')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f">
+                          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                        </svg>
+                      </span>
+                      <span class="yt-item-title">Audio track</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-value yt-active-lang" id="valAudio">Telugu</span>
+                      <span class="yt-chevron">›</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Page 2: Audio Track Submenu (Telugu & English ONLY) -->
+                <div class="yt-menu-page" id="ytPageAudio" style="display: none;">
+                  <div class="yt-submenu-header" onclick="backToYtMain()">
+                    <span class="yt-back-arrow">←</span>
+                    <span class="yt-submenu-title">Audio track</span>
+                  </div>
+                  <div class="yt-submenu-list">
+                    <div class="yt-sub-option active" id="audioOpt_telugu" onclick="selectAudioLanguage('telugu')">
+                      <span class="yt-option-check" id="check_telugu">✓</span>
+                      <div class="yt-option-text">
+                        <span class="yt-opt-name">Telugu (Default)</span>
+                        <span class="yt-opt-sub">రైతులకు ప్రాక్టికల్ వివరణ</span>
+                      </div>
+                    </div>
+                    <div class="yt-sub-option" id="audioOpt_english" onclick="selectAudioLanguage('english')">
+                      <span class="yt-option-check" id="check_english"></span>
+                      <div class="yt-option-text">
+                        <span class="yt-opt-name">English</span>
+                        <span class="yt-opt-sub">Technical Guide</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Page 3: Playback Speed Submenu -->
+                <div class="yt-menu-page" id="ytPageSpeed" style="display: none;">
+                  <div class="yt-submenu-header" onclick="backToYtMain()">
+                    <span class="yt-back-arrow">←</span>
+                    <span class="yt-submenu-title">Playback speed</span>
+                  </div>
+                  <div class="yt-submenu-list">
+                    <div class="yt-sub-option" onclick="selectPlaybackSpeed(0.5, '0.5x')">
+                      <span class="yt-option-check" id="speed_0_5"></span>
+                      <span class="yt-opt-name">0.5x</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectPlaybackSpeed(0.75, '0.75x')">
+                      <span class="yt-option-check" id="speed_0_75"></span>
+                      <span class="yt-opt-name">0.75x</span>
+                    </div>
+                    <div class="yt-sub-option active" onclick="selectPlaybackSpeed(1.0, 'Normal')">
+                      <span class="yt-option-check" id="speed_1_0">✓</span>
+                      <span class="yt-opt-name">Normal</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectPlaybackSpeed(1.25, '1.25x')">
+                      <span class="yt-option-check" id="speed_1_25"></span>
+                      <span class="yt-opt-name">1.25x</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectPlaybackSpeed(1.5, '1.5x')">
+                      <span class="yt-option-check" id="speed_1_5"></span>
+                      <span class="yt-opt-name">1.5x</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectPlaybackSpeed(2.0, '2x')">
+                      <span class="yt-option-check" id="speed_2_0"></span>
+                      <span class="yt-opt-name">2x</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Page 4: Quality Submenu -->
+                <div class="yt-menu-page" id="ytPageQuality" style="display: none;">
+                  <div class="yt-submenu-header" onclick="backToYtMain()">
+                    <span class="yt-back-arrow">←</span>
+                    <span class="yt-submenu-title">Quality</span>
+                  </div>
+                  <div class="yt-submenu-list">
+                    <div class="yt-sub-option" onclick="selectVideoQuality('Auto (1080p)')">
+                      <span class="yt-option-check" id="q_1080"></span>
+                      <span class="yt-opt-name">Auto (1080p)</span>
+                    </div>
+                    <div class="yt-sub-option active" onclick="selectVideoQuality('Auto (720p)')">
+                      <span class="yt-option-check" id="q_720">✓</span>
+                      <span class="yt-opt-name">Auto (720p)</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectVideoQuality('480p')">
+                      <span class="yt-option-check" id="q_480"></span>
+                      <span class="yt-opt-name">480p</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectVideoQuality('360p')">
+                      <span class="yt-option-check" id="q_360"></span>
+                      <span class="yt-opt-name">360p</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Page 5: Captions Submenu -->
+                <div class="yt-menu-page" id="ytPageCaptions" style="display: none;">
+                  <div class="yt-submenu-header" onclick="backToYtMain()">
+                    <span class="yt-back-arrow">←</span>
+                    <span class="yt-submenu-title">Captions</span>
+                  </div>
+                  <div class="yt-submenu-list">
+                    <div class="yt-sub-option active" onclick="selectCaptions('Off')">
+                      <span class="yt-option-check" id="cap_off">✓</span>
+                      <span class="yt-opt-name">Off</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectCaptions('Telugu')">
+                      <span class="yt-option-check" id="cap_te"></span>
+                      <span class="yt-opt-name">Telugu (తెలుగు)</span>
+                    </div>
+                    <div class="yt-sub-option" onclick="selectCaptions('English')">
+                      <span class="yt-option-check" id="cap_en"></span>
+                      <span class="yt-opt-name">English</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  </script>
+
+</body>
+</html>

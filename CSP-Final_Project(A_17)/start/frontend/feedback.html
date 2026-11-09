@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback - Smart Irrigation</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body style="
+  background: url('images/feedback2.jpg');
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: #333;
+">
+  <div align="left" style="margin-top:20px;">| 
+    <a href="main.html">⬅️⬅️</a>
+</div>  
+
+<h1 align="center">📝 Feedback Form</h1>
+<h3 align="center" style="color: white; font-weight: normal;">Share your ideas and suggestions with us</h3>
+
+  <form id="feedbackForm" align="center" method="POST" action="/api/feedback">
+    <label for="name"><b>Name :</b></label><br>
+    <input type="text" id="name" name="name" placeholder="Your name"><br><br>
+
+    <label for="email"><b>Email (optional):</b></label><br>
+    <input type="email" id="email" name="email" placeholder="Your email address"><br><br>
+
+    <label for="rating"><b>Rating:</b></label><br>
+    <select id="rating" name="rating" required>
+      <option value="">-- Select Rating --</option>
+      <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+      <option value="4">⭐⭐⭐⭐ Good</option>
+      <option value="3">⭐⭐⭐ Average</option>
+      <option value="2">⭐⭐ Needs Improvement</option>
+      <option value="1">⭐ Poor</option>
+    </select><br><br>
+
+    <label for="like"><b>What did you like?</b></label><br>
+    <textarea id="like" name="like" rows="2" cols="40" placeholder="Share what you liked..."></textarea><br><br>
+
+    <label for="improve"><b>What can be improved?</b></label><br>
+    <textarea id="improve" name="improve" rows="2" cols="40" placeholder="Suggestions for improvement..."></textarea><br><br>
+
+    <label for="comments"><b>Additional Comments:</b></label><br>
+    <textarea id="comments" name="comments" rows="2" cols="40" placeholder="Any other feedback..."></textarea><br><br>
+
+    <button type="submit">Submit Feedback</button>
+  </form>
+
+  <div id="feedbackMessage" align="center" style="margin-top:15px;"></div>
+  <script>
+    // Pre-fill user info if logged in
+    (function prefillUserInfo() {
+      try {
+        const authUser = JSON.parse(localStorage.getItem('authUser') || 'null');
+        if (authUser) {
+          if (authUser.username) document.getElementById('name').value = authUser.username;
+          if (authUser.email) document.getElementById('email').value = authUser.email;
+        }
+      } catch (e) {}
+    })();
+
+    document.getElementById('feedbackForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      const msgDiv = document.getElementById('feedbackMessage');
+
+      try {
+        const authUser = JSON.parse(localStorage.getItem('authUser') || 'null');
+        if (authUser) {
+          if (authUser.id || authUser._id) data.userId = authUser.id || authUser._id;
+          if (authUser.username) data.username = authUser.username;
+          if (authUser.email && !data.email) data.email = authUser.email;
+        }
+
+        const token = localStorage.getItem('authToken');
+        const primaryUrl = (window.location.port === "5000") ? "/api/feedback" : "http://localhost:5000/api/feedback";
+        const res = await fetch(primaryUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+          },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (res.ok) {
+          msgDiv.style.color = '#a8ffb5';
+          msgDiv.textContent = '✅ ' + (result.message || 'Feedback submitted!');
+          form.reset();
+        } else {
+          msgDiv.style.color = '#ff6b6b';
+          msgDiv.textContent = '❌ ' + (result.message || 'Error submitting feedback.');
+        }
+      } catch (e) {
+        msgDiv.style.color = '#ff6b6b';
+        msgDiv.textContent = '⚠️ Server error. Please try again later.';
+      }
+    });
+  </script>
+</body>
+</html>

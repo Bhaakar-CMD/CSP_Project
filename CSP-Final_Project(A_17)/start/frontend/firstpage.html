@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Irrigation Systems</title>
+<link rel="stylesheet" href="firstpage.css">
+</head>
+<body>
+
+  <!-- Main Heading -->
+  <header class="main-header">
+    <h1>💧 Irrigation Systems</h1>
+    <h3>Efficient Water Management for Agriculture and Crop Yield</h3>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <ul>
+      <li><a href="firstpage.html">🏠 Home</a></li>
+      <li><a href="who's.html">👥 Who's</a></li>
+      <li><a href="about.html">🚰 About</a></li>
+      <li><a href="register.html">📝 Register</a></li>
+      <li><a href="login.html">👤 Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Subheading -->
+  <section class="tagline">
+    <h2>🌿 More Crop Per Drop</h2>
+  </section>
+  <img src="images/7.jpg" alt="dam image" >
+
+  <!-- Article container with prev/next buttons -->
+  <section id="article-container">
+    <button id="prevBtn" class="button-nav" aria-label="Previous article">&lt;</button>
+
+    <div class="water-info">
+      <article class="active">
+        <h3>💧 Importance of Water in Agriculture</h3>
+        <p>Water is the most essential resource for agriculture. It supports every stage of farming — from preparing the soil, germinating seeds, and growing crops, to harvesting them. Without water, no crop can survive. For rural communities, especially in India, water is not just a farming input — it's a lifeline for survival and food security.</p>
+      </article>
+
+      <article>
+        <h3>🌾 Uses of Water in Farming</h3>
+        <p>In farming, water is used for irrigation, livestock, cleaning tools, processing crops, and maintaining healthy soil conditions. Irrigation systems allow farmers to grow food even in areas with little rainfall. Efficient water use ensures better crop yields, reduces plant diseases, and improves the quality of fruits, grains, and vegetables.</p>
+      </article>
+
+      <article>
+        <h3>⚠️ Water-Related Problems Faced by Farmers</h3>
+        <p>Many farmers today face challenges like irregular rainfall, droughts, and overdependence on groundwater. In some regions, water sources are polluted or drying up. Poor irrigation practices can also lead to waterlogging, soil erosion, or salinity, damaging crop health. These water issues increase farming costs and reduce productivity, affecting farmer incomes.</p>
+      </article>
+
+      <article>
+        <h3>💡 The Need for Smart Water Management</h3>
+        <p>To overcome these challenges, modern irrigation methods like drip and sprinkler systems help deliver water directly to plant roots with less wastage. Rainwater harvesting, water recycling, and using weather-based irrigation tools can also help. Educating farmers about sustainable water use is key to ensuring long-term agricultural success and environmental protection.</p>
+      </article>
+    </div>
+
+    <button id="nextBtn" class="button-nav" aria-label="Next article">&gt;</button>
+  </section>
+
+  <script>
+    const articles = document.querySelectorAll('.water-info article');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function showArticle(index) {
+      articles.forEach((article, i) => {
+        article.classList.toggle('active', i === index);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + articles.length) % articles.length;
+      showArticle(currentIndex);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % articles.length;
+      showArticle(currentIndex);
+    });
+
+    // Initial display
+    showArticle(currentIndex);
+
+    // If user is already logged in, allow direct access to Main page without re-logging in
+    (function checkAuthNav() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("logged_out") === "1") {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authUser");
+        return;
+      }
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        const loginLink = document.querySelector('a[href="login.html"]');
+        if (loginLink) {
+          loginLink.href = "main.html";
+          loginLink.innerHTML = "🌾 Dashboard";
+          loginLink.title = "Go to Smart Irrigation Dashboard";
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

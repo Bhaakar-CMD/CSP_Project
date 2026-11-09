@@ -1,0 +1,445 @@
+/* furrow.css */
+
+/* General body styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fdf7f2; /* light cream background */
+  margin: 0;
+  padding: 0;
+  color: #333;
+  line-height: 1.8;
+}
+
+/* Header */
+header {
+  text-align: center;
+  background-color: #d96c06; /* warm orange */
+  color: white;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  font-size: 1.1rem;
+  color: #fff8e7;
+}
+
+/* Section box styling */
+section {
+  background: #ffffff;
+  margin: 25px auto;
+  max-width: 1000px;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-left: 6px solid #d96c06;
+}
+
+/* Headings */
+h2 {
+  color: #7a3e00;
+  font-size: 1.6rem;
+  border-left: 6px solid #ff9b42;
+  padding-left: 10px;
+}
+
+/* Paragraphs */
+p {
+  font-size: 1rem;
+  color: #444;
+  margin: 10px 0;
+}
+
+/* Lists */
+ul, ol {
+  margin: 15px 30px;
+  padding: 15px;
+  background-color: #fff7ee;
+  border-radius: 8px;
+  border-left: 5px solid #d96c06;
+}
+
+ul li, ol li {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+/* Back Button */
+footer {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.back {
+  display: inline-block;
+  text-decoration: none;
+  background-color: #d96c06;
+  color: white;
+  padding: 14px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.back:hover {
+  background-color: #7a3e00;
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  section {
+    margin: 15px;
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* YouTube Modern White Settings & In-Player Controls */
+.video-player-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 14px 0;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.video-container iframe,
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 12px;
+}
+
+/* In-player top control bar */
+.yt-player-controls-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  z-index: 40;
+  pointer-events: auto;
+}
+
+.yt-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yt-live-indicator {
+  font-size: 0.72em;
+  font-weight: 800;
+  background: #cc181e;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.yt-video-title-label {
+  color: #ffffff;
+  font-size: 0.88em;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.yt-gear-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.25s ease, background 0.2s;
+}
+
+.yt-gear-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(45deg);
+}
+
+.yt-gear-svg {
+  display: block;
+}
+
+/* Dark semi-transparent overlay */
+.yt-dark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 50;
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+/* White settings panel matching YouTube */
+.yt-white-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 290px;
+  max-width: 88%;
+  background: #ffffff;
+  color: #0f0f0f;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  z-index: 60;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  overflow: hidden;
+  animation: ytSlideUp 0.18s cubic-bezier(0, 0, 0.2, 1);
+  text-align: left;
+}
+
+@keyframes ytSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.yt-menu-page {
+  padding: 6px 0;
+}
+
+.yt-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.yt-menu-item:hover {
+  background: #f2f2f2;
+}
+
+.yt-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yt-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  color: #0f0f0f;
+}
+
+.yt-item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.yt-item-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.yt-item-value {
+  font-size: 13px;
+  color: #606060;
+  font-weight: 400;
+}
+
+.yt-active-lang {
+  color: #065fd4;
+  font-weight: 600;
+}
+
+.yt-chevron {
+  font-size: 16px;
+  color: #909090;
+  line-height: 1;
+}
+
+/* Submenu styling */
+.yt-submenu-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f0f0f;
+  transition: background 0.15s ease;
+}
+
+.yt-submenu-header:hover {
+  background: #f2f2f2;
+}
+
+.yt-back-arrow {
+  font-size: 18px;
+  line-height: 1;
+  color: #0f0f0f;
+}
+
+.yt-submenu-list {
+  padding: 4px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.yt-sub-option {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.yt-sub-option:hover {
+  background: #f2f2f2;
+}
+
+.yt-sub-option.active {
+  background: #e8f0fe;
+}
+
+.yt-option-check {
+  width: 18px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #065fd4;
+  display: inline-block;
+  text-align: center;
+}
+
+.yt-option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.yt-opt-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.yt-opt-sub {
+  font-size: 11px;
+  color: #606060;
+}
+
+/* Farmer Language Info Bar underneath player */
+.yt-farmer-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-top: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.yt-current-track-badge {
+  font-size: 0.88em;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.furrow-action-links {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.furrow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  background: #d96c06;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.92em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.furrow-btn:hover {
+  background: #bf5d00;
+}
+
+.furrow-btn-yt {
+  background: #cc181e;
+}
+
+.furrow-btn-yt:hover {
+  background: #b01318;
+}
+
+@media (max-width: 600px) {
+  .yt-white-panel {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: 100%;
+  }
+}

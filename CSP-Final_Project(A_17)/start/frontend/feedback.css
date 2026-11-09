@@ -1,0 +1,135 @@
+/* feedback.css - Clean White Theme */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: url('images/feedback.jpg');
+  background-size: cover;
+  background-color: #f9f9f9; /* fallback */
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Back link top-left */
+.back-top-left {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #4caf50;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+.back-top-left:hover {
+  background-color: #388e3c;
+  transform: scale(1.05);
+}
+
+/* Heading */
+h1 {
+  font-size: 2.4em;
+  margin-top: 60px;
+  color: #2e7d32;
+  text-align: center;
+}
+
+/* Form container */
+form {
+  margin: 40px auto;
+  padding: 30px 25px;
+  width: 90%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+/* Labels */
+label {
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+/* Inputs, select, textarea */
+input[type="text"],
+select,
+textarea {
+  width: 90%;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
+}
+
+/* Button */
+button[type="submit"] {
+  background: #4caf50;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background: #388e3c;
+  transform: scale(1.05);
+}
+
+/* Feedback message */
+#feedbackMessage {
+  font-size: 1.1rem;
+  margin-top: 15px;
+}
+
+/* Bottom dashboard link */
+div[align="center"] a {
+  font-size: 1rem;
+  text-decoration: none;
+  color: #388e3c;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 20px;
+}
+div[align="center"] a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 2em;
+  }
+  form {
+    padding: 20px;
+  }
+}

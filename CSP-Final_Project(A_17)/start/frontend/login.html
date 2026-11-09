@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Modern Irrigation Recommendation</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="firstpage.html" class="brand-badge" title="Irrigation Knowledge Base">
+      <div class="brand-icon">🌱</div>
+      <div class="brand-text">
+        <h1>Modern Irrigation System</h1>
+        <p>Smart Precision Agriculture</p>
+      </div>
+    </a>
+    <div class="nav-quick-links">
+      <a href="firstpage.html">🏠 About Systems</a>
+    </div>
+  </header>
+
+  <!-- Login Card Container -->
+  <main class="login-container">
+    <div class="login-card">
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="icon-circle">💧</div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to access personalized crop irrigation advice</p>
+      </div>
+
+      <!-- Alert / Notification Message -->
+      <div id="alertBox" class="alert-box" role="alert">
+        <span id="alertIcon">⚠️</span>
+        <span id="alertText"></span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" novalidate autocomplete="on">
+
+        <!-- Email or Username Field -->
+        <div class="form-group">
+          <label for="username">
+            <span class="label-icon">👤</span> Email or Username
+          </label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              placeholder="Enter your username or email" 
+              required 
+              autocomplete="username"
+              autofocus
+            >
+          </div>
+        </div>
+
+        <!-- Password Field with Show/Hide Toggle -->
+        <div class="form-group">
+          <label for="password">
+            <span class="label-icon">🔒</span> Password
+          </label>
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Enter your password" 
+              required 
+              autocomplete="current-password"
+            >
+            <button 
+              type="button" 
+              id="togglePasswordBtn" 
+              class="password-toggle-btn" 
+              aria-label="Show password" 
+              title="Show or hide password"
+            >
+              <!-- Eye Icon SVG (Show) -->
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <!-- Eye Off Icon SVG (Hide) -->
+              <svg id="eyeOffIcon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Extra Options: Admin Login & Remember Me -->
+        <div class="form-options">
+          <label class="checkbox-label" for="rememberMe">
+            <input type="checkbox" id="rememberMe" name="rememberMe" checked>
+            <span>Remember me</span>
+          </label>
+          <label class="checkbox-label" for="isAdmin">
+            <input type="checkbox" id="isAdmin" name="isAdmin">
+            <span>Admin Login</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="btn-submit">
+          <span class="btn-spinner" id="btnSpinner"></span>
+          <span id="btnText">🚀 Sign In to Dashboard</span>
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="card-divider">
+        <span>New to Modern Irrigation?</span>
+      </div>
+
+      <!-- Register / Sign Up Section -->
+      <div class="register-section">
+        <p>Don't have an account yet?</p>
+        <a href="register.html" class="btn-register-link">📝 Register / Sign Up</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <p>💧 Modern Irrigation Recommendation &copy; Precision Agricultural Technology</p>
+  </footer>
+
+  <!-- Login Logic Script -->
+  <script>
+    // 1. Show / Hide Password Toggle
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const eyeIcon = document.getElementById("eyeIcon");
+    const eyeOffIcon = document.getElementById("eyeOffIcon");
+
+    togglePasswordBtn.addEventListener("click", () => {
+      const isPassword = passwordInput.getAttribute("type") === "password";
+      if (isPassword) {
+        passwordInput.setAttribute("type", "text");
+        eyeIcon.style.display = "none";
+        eyeOffIcon.style.display = "block";
+        togglePasswordBtn.setAttribute("aria-label", "Hide password");
+      } else {
+        passwordInput.setAttribute("type", "password");
+        eyeIcon.style.display = "block";
+        eyeOffIcon.style.display = "none";
+        togglePasswordBtn.setAttribute("aria-label", "Show password");
+      }
+    });
+
+    // 2. Alert Notification Helper
+    const alertBox = document.getElementById("alertBox");
+    const alertText = document.getElementById("alertText");
+    const alertIcon = document.getElementById("alertIcon");
+
+    function showAlert(type, message) {
+      alertBox.className = "alert-box show " + type;
+      alertText.textContent = message;
+      if (type === "error") alertIcon.textContent = "❌";
+      else if (type === "warning") alertIcon.textContent = "⚠️";
+      else if (type === "success") alertIcon.textContent = "✅";
+    }
+
+    function clearAlert() {
+      alertBox.className = "alert-box";
+      alertText.textContent = "";
+    }
+
+    // Check if user is already logged in (redirect to main.html)
+    (async function checkExistingSession() {
+      const params = new URLSearchParams(window.location.search);
+      // If user was explicitly sent with unauthorized or logged_out or registered, don't auto-redirect
+      if (params.get("unauthorized") || params.get("logged_out") || params.get("registered")) {
+        return;
+      }
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+      try {
+        const response = await fetch("/api/auth/me", {
+          headers: { "Authorization": `Bearer ${token}` },
+          credentials: "include"
+        });
+        if (response.ok) {
+          window.location.replace("main.html");
+        }
+      } catch (err) {
+        // Continue to show login form if verification fails
+      }
+    })();
+
+    // 3. Inspect URL query params for notices
+    (function handleUrlNotices() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("unauthorized") === "1") {
+        showAlert("warning", "Please sign in to access the Irrigation Recommendation Homepage.");
+      } else if (params.get("logged_out") === "1") {
+        showAlert("success", "You have been logged out successfully.");
+      } else if (params.get("registered") === "1") {
+        showAlert("success", "Registration successful! Please log in with your credentials.");
+        const user = params.get("user");
+        if (user) {
+          document.getElementById("username").value = user;
+          document.getElementById("password").focus();
+        }
+      }
+    })();
+
+    // 4. Form Submit Handler
+    const form = document.getElementById("loginForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const btnText = document.getElementById("btnText");
+
+    function setSubmitting(isSubmitting) {
+      submitBtn.disabled = isSubmitting;
+      btnSpinner.style.display = isSubmitting ? "inline-block" : "none";
+      btnText.textContent = isSubmitting ? "Signing in..." : "🚀 Sign In to Dashboard";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearAlert();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const isAdmin = document.getElementById("isAdmin").checked;
+
+      if (!username || !password) {
+        showAlert("error", "Please provide both username/email and password.");
+        return;
+      }
+
+      setSubmitting(true);
+
+      try {
+        const url = isAdmin ? "/admin/login" : "/login";
+        const payload = isAdmin 
+          ? { username, password } 
+          : { identifier: username, username, password };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert("success", (result.message || "Login successful!") + " Redirecting...");
+          
+          if (isAdmin && result.token) {
+            localStorage.setItem("adminToken", result.token);
+            setTimeout(() => {
+              window.location.href = "admin_feedback.html";
+            }, 600);
+          } else {
+            if (result.token) {
+              localStorage.setItem("authToken", result.token);
+            }
+            if (result.user) {
+              localStorage.setItem("authUser", JSON.stringify(result.user));
+            }
+            setTimeout(() => {
+              window.location.href = "main.html";
+            }, 600);
+          }
+        } else {
+          setSubmitting(false);
+          showAlert("error", result.message || "Invalid credentials. Please try again.");
+        }
+      } catch (err) {
+        setSubmitting(false);
+        console.error("Login request error:", err);
+        showAlert("error", "Could not connect to the server. Please verify your connection.");
+      }
+    });
+  </script>
+
+</body>
+</html>
