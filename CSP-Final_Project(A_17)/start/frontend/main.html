@@ -468,7 +468,7 @@
 
       try {
         const authToken = localStorage.getItem("authToken") || "";
-        const primaryUrl = (window.location.port === "5000") ? "/suggest" : "http://localhost:5000/suggest";
+        const primaryUrl = "/suggest";
         
         let response = await fetch(primaryUrl, {
           method: "POST",

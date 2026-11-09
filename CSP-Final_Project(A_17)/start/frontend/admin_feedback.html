@@ -405,7 +405,7 @@
     }
 
     function getApiUrl(endpoint) {
-      return (window.location.port === "5000") ? endpoint : ("http://localhost:5000" + endpoint);
+      return endpoint;
     }
 
     let allUsers = [];

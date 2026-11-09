@@ -1,0 +1,22 @@
+{
+  "name": "smart-modern-irrigation-system",
+  "version": "1.0.0",
+  "description": "Smart Modern Irrigation Recommendation System",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node CSP-Final_Project(A_17)/start/backend/server.js",
+    "dev": "nodemon CSP-Final_Project(A_17)/start/backend/server.js",
+    "test": "node CSP-Final_Project(A_17)/start/backend/test_auth.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

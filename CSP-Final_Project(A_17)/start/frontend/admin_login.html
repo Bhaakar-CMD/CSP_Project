@@ -30,7 +30,7 @@
       const password = document.getElementById('password').value;
       const msgDiv = document.getElementById('loginMessage');
       try {
-        const url = (window.location.port === "5000") ? "/admin/login" : "http://localhost:5000/admin/login";
+        const url = "/admin/login";
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

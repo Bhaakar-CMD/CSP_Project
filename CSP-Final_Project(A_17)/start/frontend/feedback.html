@@ -78,7 +78,7 @@
         }
 
         const token = localStorage.getItem('authToken');
-        const primaryUrl = (window.location.port === "5000") ? "/api/feedback" : "http://localhost:5000/api/feedback";
+        const primaryUrl = "/api/feedback";
         const res = await fetch(primaryUrl, {
           method: 'POST',
           headers: {

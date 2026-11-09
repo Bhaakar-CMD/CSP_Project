@@ -1,3 +1,4 @@
+process.env.NODE_ENV = process.env.NODE_ENV || "test";
 const http = require("http");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -47,7 +48,7 @@ async function runTests() {
   // 2. HTTP SERVER ROUTE TESTS
   console.log("\n2. Starting local HTTP test server on port 5055...");
   const server = http.createServer(app);
-  await new Promise((res) => server.listen(5055, res));
+  await new Promise((res) => server.listen(5055, "127.0.0.1", res));
 
   function request(path, options = {}) {
     return new Promise((resolve, reject) => {

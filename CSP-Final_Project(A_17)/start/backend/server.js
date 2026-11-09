@@ -1,13 +1,26 @@
 const path = require("path");
+const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 
-require("dotenv").config({
-  path: path.resolve(__dirname, "../.env"),
-});
+// Multi-path .env loader for local and deployment flexibility
+const envPaths = [
+  path.resolve(__dirname, "../.env"),
+  path.resolve(__dirname, "../../.env"),
+  path.resolve(process.cwd(), "CSP-Final_Project(A_17)/start/.env"),
+  path.resolve(process.cwd(), "start/.env"),
+  path.resolve(process.cwd(), ".env"),
+];
+for (const ep of envPaths) {
+  if (fs.existsSync(ep)) {
+    require("dotenv").config({ path: ep });
+    break;
+  }
+}
+require("dotenv").config();
 
 const app = express();
 
@@ -16,12 +29,54 @@ const app = express();
 // ==========================================
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI;
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "supersecrettoken";
 const JWT_SECRET = process.env.JWT_SECRET || "smart-irrigation-jwt-secret-key-2026-secure-token";
+
+// ==========================================
+// MONGODB CONNECTION CACHING (SERVERLESS & LOCAL)
+// ==========================================
+
+let cachedDbPromise = null;
+
+async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (cachedDbPromise) {
+    return cachedDbPromise;
+  }
+
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    throw new Error(
+      "MONGO_URI environment variable is missing. In Vercel, please add MONGO_URI in Project Settings > Environment Variables."
+    );
+  }
+
+  cachedDbPromise = mongoose
+    .connect(uri, {
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 8000,
+    })
+    .then((m) => {
+      console.log(
+        "MongoDB Connected successfully. Database:",
+        m.connection.name
+      );
+      return m.connection;
+    })
+    .catch((err) => {
+      cachedDbPromise = null;
+      console.error("MongoDB Connection Failed:", err.message);
+      throw err;
+    });
+
+  return cachedDbPromise;
+}
 
 // ==========================================
 // MIDDLEWARE
@@ -35,6 +90,31 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Database connection middleware for routes requiring MongoDB
+async function ensureDb(req, res, next) {
+  if (mongoose.connection.readyState === 1 || process.env.NODE_ENV === "test") {
+    return next();
+  }
+  try {
+    await connectToDatabase();
+    return next();
+  } catch (err) {
+    console.error("Database Connection Middleware Error:", err.message);
+    const isAtlasWhitelist =
+      err.name === "MongooseServerSelectionError" ||
+      (err.message && err.message.includes("Could not connect to any servers"));
+
+    const hint = isAtlasWhitelist
+      ? " MongoDB Atlas is blocking Vercel. In MongoDB Atlas, go to Network Access -> Add IP Address -> Select 'Allow Access from Anywhere' (0.0.0.0/0)."
+      : " Please verify your MONGO_URI in Vercel Project Settings > Environment Variables.";
+
+    return res.status(500).json({
+      message: "Database connection failed." + hint,
+      error: process.env.NODE_ENV === "production" ? undefined : err.message,
+    });
+  }
+}
 
 // ==========================================
 // USER SCHEMA AND MODEL
@@ -254,7 +334,7 @@ app.post("/admin/login", (req, res) => {
 // USER REGISTRATION
 // ==========================================
 
-app.post("/register", async (req, res) => {
+app.post("/register", ensureDb, async (req, res) => {
   try {
     const { username, email, password, confirm } = req.body;
 
@@ -341,7 +421,7 @@ app.post("/register", async (req, res) => {
 // USER LOGIN
 // ==========================================
 
-app.post("/login", async (req, res) => {
+app.post("/login", ensureDb, async (req, res) => {
   try {
     const loginIdentifier = (
       req.body.identifier ||
@@ -404,9 +484,17 @@ app.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login Error:", error);
+    const isDbError =
+      error.name === "MongooseServerSelectionError" ||
+      (error.message && error.message.includes("Could not connect"));
+
+    const message = isDbError
+      ? "Database connection failed. Please ensure MongoDB Atlas Network Access allows 0.0.0.0/0 (anywhere)."
+      : "Server error during login.";
 
     return res.status(500).json({
-      message: "Server error during login.",
+      message,
+      error: process.env.NODE_ENV === "production" ? undefined : error.message,
     });
   }
 });
@@ -514,7 +602,7 @@ function getMethodMedia(methodName) {
 }
 
 // Protected recommendation endpoint: Unauthorized users are blocked
-app.post("/suggest", requireUserAuth, async (req, res) => {
+app.post("/suggest", requireUserAuth, ensureDb, async (req, res) => {
   try {
     const { crop, soil, water, area } = req.body;
 
@@ -667,7 +755,7 @@ app.post("/suggest", requireUserAuth, async (req, res) => {
 // GET REGISTERED USERS COUNT (ADMIN ONLY)
 // ==========================================
 
-app.get("/users/count", requireAdminAuth, async (req, res) => {
+app.get("/users/count", requireAdminAuth, ensureDb, async (req, res) => {
   try {
     const count = await User.countDocuments();
 
@@ -687,7 +775,7 @@ app.get("/users/count", requireAdminAuth, async (req, res) => {
 // GET ALL REGISTERED USERS (ADMIN ONLY)
 // ==========================================
 
-app.get("/admin/users", requireAdminAuth, async (req, res) => {
+app.get("/admin/users", requireAdminAuth, ensureDb, async (req, res) => {
   try {
     const users = await User.find({}, "-password").sort({ createdAt: -1 }).lean();
 
@@ -727,7 +815,7 @@ app.get("/admin/users", requireAdminAuth, async (req, res) => {
 // GET SPECIFIC USER'S FEEDBACK (ADMIN ONLY)
 // ==========================================
 
-app.get("/admin/users/:id/feedback", requireAdminAuth, async (req, res) => {
+app.get("/admin/users/:id/feedback", requireAdminAuth, ensureDb, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({
@@ -777,7 +865,7 @@ app.get("/admin/users/:id/feedback", requireAdminAuth, async (req, res) => {
 // SUBMIT FEEDBACK
 // ==========================================
 
-app.post("/api/feedback", async (req, res) => {
+app.post("/api/feedback", ensureDb, async (req, res) => {
   try {
     const { name, email, rating, like, improve, comments, userId, username } = req.body;
     const authUser = getAuthenticatedUser(req);
@@ -814,7 +902,7 @@ app.post("/api/feedback", async (req, res) => {
 // GET ALL FEEDBACK (ADMIN ONLY)
 // ==========================================
 
-app.get("/feedbacks", requireAdminAuth, async (req, res) => {
+app.get("/feedbacks", requireAdminAuth, ensureDb, async (req, res) => {
   try {
     const feedbacks = await Feedback.find()
       .sort({ createdAt: -1 })
@@ -834,7 +922,7 @@ app.get("/feedbacks", requireAdminAuth, async (req, res) => {
 // DELETE FEEDBACK (ADMIN ONLY)
 // ==========================================
 
-app.delete("/feedbacks/:id", requireAdminAuth, async (req, res) => {
+app.delete("/feedbacks/:id", requireAdminAuth, ensureDb, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({
@@ -863,10 +951,56 @@ app.delete("/feedbacks/:id", requireAdminAuth, async (req, res) => {
 });
 
 // ==========================================
+// HEALTH CHECK ENDPOINT (DIAGNOSTICS & MONITORING)
+// ==========================================
+
+app.get("/api/health", async (req, res) => {
+  let dbStatus = "disconnected";
+  let dbError = null;
+
+  try {
+    await connectToDatabase();
+    dbStatus = mongoose.connection.readyState === 1 ? "connected" : "connecting";
+  } catch (err) {
+    dbStatus = "error";
+    dbError = err.message;
+  }
+
+  return res.status(200).json({
+    status: "ok",
+    database: dbStatus,
+    databaseName: mongoose.connection.name || null,
+    databaseError: dbError,
+    environment: {
+      hasMongoUri: Boolean(process.env.MONGO_URI),
+      hasAdminToken: Boolean(process.env.ADMIN_TOKEN),
+      hasJwtSecret: Boolean(process.env.JWT_SECRET),
+      nodeEnv: process.env.NODE_ENV || "development",
+      port: process.env.PORT || 5000,
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ==========================================
 // PROTECTED PAGES & STATIC FILES ROUTING
 // ==========================================
 
-const frontendPath = path.join(__dirname, "../frontend");
+// Multi-path frontend folder resolution (works both in local dev and on Vercel)
+const possibleFrontendPaths = [
+  path.join(__dirname, "../frontend"),
+  path.join(__dirname, "../../frontend"),
+  path.join(process.cwd(), "CSP-Final_Project(A_17)/start/frontend"),
+  path.join(process.cwd(), "start/frontend"),
+  path.join(process.cwd(), "frontend"),
+];
+let frontendPath = path.join(__dirname, "../frontend");
+for (const p of possibleFrontendPaths) {
+  if (fs.existsSync(p)) {
+    frontendPath = p;
+    break;
+  }
+}
 
 // Requirement 1: When a user opens http://localhost:5000, display the First page.
 app.get("/", (req, res) => {
@@ -900,38 +1034,32 @@ app.use((req, res) => {
 });
 
 // ==========================================
-// START SERVER AND CONNECT TO MONGODB
+// START SERVER AND CONNECT TO MONGODB (LOCAL)
 // ==========================================
 
 async function startServer() {
   try {
-    if (!MONGO_URI) {
-      throw new Error(
-        "MONGO_URI is missing. Check your .env file."
-      );
-    }
-
-    await mongoose.connect(MONGO_URI);
-
-    console.log("MongoDB Connected");
+    await connectToDatabase();
     console.log("Database:", mongoose.connection.name);
     console.log("Collection:", Method.collection.name);
-
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
   } catch (error) {
-    console.error("Server startup error:", error.message);
-    process.exit(1);
+    console.warn("Initial DB connection warning (will retry on incoming requests):", error.message);
   }
+
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 }
 
 if (require.main === module) {
   startServer();
 }
 
+app.app = app;
 module.exports = app;
 
+module.exports.app = app;
+module.exports.connectToDatabase = connectToDatabase;
 module.exports.startServer = startServer;
 module.exports.generateToken = generateToken;
 module.exports.verifyToken = verifyToken;
